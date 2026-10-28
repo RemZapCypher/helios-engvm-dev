@@ -10,13 +10,19 @@ BE=helios
 
 remove_zpool=no
 
-while getopts 'f' c; do
+while getopts 'f:s:d:' c; do
 	case "$c" in
 	f)
 		remove_zpool=yes
 		;;
+	s)
+		swap_size="$OPTARG"
+		;;
+	d)
+		dump_size="$OPTARG"
+		;;
 	*)
-		printf 'Usage: %s: [-f] NODENAME DISK...\n' >&2
+		printf 'Usage: %s: [-f] [-s swap_size] [-d dump_size] NODENAME DISK...\n' >&2
 		exit 2
 		;;
 	esac
@@ -200,6 +206,21 @@ bootadm install-bootloader -M -f -P rpool -R /a
 bootadm update-archive -f -R /a
 
 zfs create -o mountpoint=/home rpool/home
+
+if [[ -n "$swap_size" ]]; then
+	zfs create -V "$swap_size" rpool/swap
+	echo "/dev/zvol/dsk/rpool/swap - - swap - no -" >> /a/etc/vfstab
+fi
+
+if [[ -n "$dump_size" ]]; then
+	zfs create -V "$dump_size" rpool/dump
+	# dumpadm configuration: create the config file directly
+	cat > /a/etc/dumpadm.conf <<EOF
+DUMPADM_ENABLE=yes
+DUMPADM_DEVICE=/dev/zvol/dsk/rpool/dump
+DUMPADM_CONTENT=kernel
+EOF
+fi
 
 set +o xtrace
 
