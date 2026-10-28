@@ -371,6 +371,9 @@ half the size of RAM is probably a good guess.
 # /sbin/swapadd
 ```
 
+**Note**: `install-helios` can create a swap device automatically with the
+`-s <size>` option (e.g., `-s 8G`). By default no swap device is created.
+
 ### Configure a dump device
 
 Also useful is to configure a dump device for capturing system crash dumps:
@@ -386,6 +389,10 @@ the allocated kernel memory in a system.  The most correct answer for sizing is
 estimate how large a dump would be if the system panicked right now with
 `dumpadm -e`, but note that this estimate does not reflect how large a dump
 might be after you begin seriously using the system.
+
+**Note**: `install-helios` can create and configure a dump device automatically
+with the `-d <size>` option (e.g., `-d 8G`). By default no dump device is
+created.
 
 ### Updating your system
 
